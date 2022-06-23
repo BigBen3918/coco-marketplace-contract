@@ -1,0 +1,50 @@
+[
+    {
+        "address": "NFT address",
+        "metadata": {
+            "name": "shooting",
+            "description": "this is shooting game nft",
+            "coverImage": "http://image.png",
+            "backgroundImage": "https://bg.png",
+            "external_link": "http://shooting.com",
+            "fee": "10",
+            "fee_recipient": "0xa"
+        },
+        "items": {
+            "0": {
+                "owner": "0xad...",
+                "metadata": {
+                    "image": "http://ipfs.io/a",
+                    "external_url": "http://shooting.com/nft/0",
+                    "description": "NFT-art-1",
+                    "name": "effect-1",
+                    "attributes": [
+                        {
+                            "trait_type": "blur",
+                            "value": "0.4",
+                            "display_type": "number"
+                        }
+                    ],
+                    "background_color": "white",
+                    "animation_url": "http://ipfs.io/QMsdf",
+                    "youtube_url": "http://.."
+                },
+                "marketdata": {
+                    "prices": [
+                        {
+                            "time": 23423423,
+                            "price": 0.5
+                        }
+                    ],
+                    "owners": ["0x", "0x"],
+                    "bidders": [
+                        {
+                            "address": "0x",
+                            "price": "1"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+]

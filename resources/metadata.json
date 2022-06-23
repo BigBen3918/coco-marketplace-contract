@@ -1,0 +1,117 @@
+[
+    {
+        "image": "https://ipfs.io/ipfs/QmeXhTXd37NdCtKwCkx89hyUN7cfvnQi2JHzszKhT1ysqQ",
+        "external_url": "http://localhost:3001",
+        "description": "NFT-art-1",
+        "name": "effect-1",
+        "attributes": [
+            {
+                "key": "trait_type",
+                "value": "blur"
+            },
+            {
+                "key": "value",
+                "value": "0.4"
+            },
+            {
+                "key": "display_type",
+                "value": "number"
+            }
+        ],
+        "background_color": "white",
+        "animation_url": "",
+        "youtube_url": ""
+    },
+    {
+        "image": "https://ipfs.io/ipfs/QmeawJUyftSZrBWuaVGLN4SxsKPKvzSAPsYdhWBWqqVU5U",
+        "external_url": "http://localhost:3001",
+        "description": "NFT-art-2",
+        "name": "effect-2",
+        "attributes": [
+            {
+                "key": "trait_type",
+                "value": "blur"
+            },
+            {
+                "key": "value",
+                "value": "0.4"
+            },
+            {
+                "key": "display_type",
+                "value": "number"
+            }
+        ],
+        "background_color": "white",
+        "animation_url": "",
+        "youtube_url": ""
+    },
+    {
+        "image": "https://ipfs.io/ipfs/QmcW6m2VXTHLo9pMb7vL1tWE2GBaY4avV37CBheSGWYTe9",
+        "external_url": "http://localhost:3001",
+        "description": "NFT-art-3",
+        "name": "effect-3",
+        "attributes": [
+            {
+                "key": "trait_type",
+                "value": "blur"
+            },
+            {
+                "key": "value",
+                "value": "0.4"
+            },
+            {
+                "key": "display_type",
+                "value": "number"
+            }
+        ],
+        "background_color": "white",
+        "animation_url": "",
+        "youtube_url": ""
+    },
+    {
+        "image": "https://ipfs.io/ipfs/QmTMjvsdiXSopxjCM7zuyqU1gDtuToz1QBnWNxmhfvyg4z",
+        "external_url": "http://localhost:3001",
+        "description": "NFT-art-4",
+        "name": "effect-4",
+        "attributes": [
+            {
+                "key": "trait_type",
+                "value": "blur"
+            },
+            {
+                "key": "value",
+                "value": "0.4"
+            },
+            {
+                "key": "display_type",
+                "value": "number"
+            }
+        ],
+        "background_color": "white",
+        "animation_url": "",
+        "youtube_url": ""
+    },
+    {
+        "image": "https://ipfs.io/ipfs/QmeawJUyftSZrBWuaVGLN4SxsKPKvzSAPsYdhWBWqqVU5U",
+        "external_url": "http://localhost:3001",
+        "description": "NFT-art-5",
+        "name": "effect-5",
+        "attributes": [
+            {
+                "key": "trait_type",
+                "value": "blur"
+            },
+            {
+                "key": "value",
+                "value": "0.4"
+            },
+            {
+                "key": "display_type",
+                "value": "number"
+            }
+        ],
+        "background_color": "white",
+        "animation_url": "",
+        "youtube_url": ""
+    }
+]
