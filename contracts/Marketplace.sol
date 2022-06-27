@@ -59,11 +59,12 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
      */
     function createOrder(
         address _nftAddress,
+        address owner,
         uint256 _assetId,
         uint256 _priceInWei,
         uint256 _expiresAt
-    ) public whenNotPaused {
-        _createOrder(_nftAddress, _assetId, _priceInWei, _expiresAt);
+    ) public override whenNotPaused {
+        _createOrder(_nftAddress, owner, _assetId, _priceInWei, _expiresAt);
     }
 
     /**
@@ -374,6 +375,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
      */
     function _createOrder(
         address _nftAddress,
+        address _owner,
         uint256 _assetId,
         uint256 _priceInWei,
         uint256 _expiresAt
@@ -403,7 +405,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
         bytes32 orderId = keccak256(
             abi.encodePacked(
                 block.timestamp,
-                assetOwner,
+                _owner,
                 _nftAddress,
                 _assetId,
                 _priceInWei
@@ -413,7 +415,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
         // save order
         orderByAssetId[_nftAddress][_assetId] = Order({
             id: orderId,
-            seller: assetOwner,
+            seller: _owner,
             nftAddress: _nftAddress,
             price: _priceInWei,
             expiresAt: _expiresAt
@@ -421,7 +423,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
 
         emit OrderCreated(
             orderId,
-            assetOwner,
+            _owner,
             _nftAddress,
             _assetId,
             _priceInWei,

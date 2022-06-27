@@ -67,4 +67,12 @@ interface IMarketplace {
         address seller,
         uint256 priceInWei
     );
+
+    function createOrder(
+        address _nftAddress,
+        address owner,
+        uint256 _assetId,
+        uint256 _priceInWei,
+        uint256 _expiresAt
+    ) external;
 }
