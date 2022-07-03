@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 import "./IMarketplace.sol";
 
@@ -122,7 +121,7 @@ library VerifySignature {
     }
 }
 
-contract StoreFront2 is ERC721("MyNFT", "TNFT"), ERC721Enumerable {
+contract StoreFront is ERC721, ERC721Enumerable {
     mapping(uint256 => string) private TokenURI;
 
     using Address for address;
@@ -134,7 +133,11 @@ contract StoreFront2 is ERC721("MyNFT", "TNFT"), ERC721Enumerable {
     address public signerAddress;
     string private baseUri;
 
-    constructor(address adminAddress) {
+    constructor(
+        address adminAddress,
+        string memory name,
+        string memory symbol
+    ) ERC721(name, symbol) {
         signerAddress = adminAddress;
         baseUri = "https://ipfs.io/ipfs"; //"https://ipfs.io/ipfs";
     }
@@ -158,33 +161,42 @@ contract StoreFront2 is ERC721("MyNFT", "TNFT"), ERC721Enumerable {
 
     function creatorOf(uint tokenId) public view virtual returns (address) {
         address creator = creators[tokenId];
-        require(
-            creator != address(0),
-            "ERC721: owner query for nonexistent token"
-        );
         return creator;
     }
 
     function mintAndOnsale(
         uint tokenId,
         address market,
+        address _acceptedToken,
         uint256 _priceInWei,
         uint256 _expiresAt,
         bytes memory signature
     ) public payable {
         //mint
         require(
-            verify(tokenId, msg.sender, _priceInWei, _expiresAt, signature),
+            verify(
+                tokenId,
+                msg.sender,
+                market,
+                _priceInWei,
+                _expiresAt,
+                signature
+            ),
             "invalid params"
         );
-        require(ownerOf(tokenId) == address(0), "already minted");
         creators[tokenId] = msg.sender;
         _mint(address(this), tokenId);
-        approve(market, tokenId);
+        address owner = ownerOf(tokenId);
+        require(
+            owner == address(this),
+            string(abi.encodePacked(owner, "/", address(this)))
+        );
+        _approve(market, tokenId);
         IMarketplace(market).createOrder(
             address(this),
             msg.sender,
             tokenId,
+            _acceptedToken,
             _priceInWei,
             _expiresAt
         );
@@ -212,18 +224,26 @@ contract StoreFront2 is ERC721("MyNFT", "TNFT"), ERC721Enumerable {
     function getMessageHash(
         uint tokenId,
         address owner,
+        address market,
         uint256 _priceInWei,
         uint256 _expiresAt
     ) public pure returns (bytes32) {
         return
             keccak256(
-                abi.encodePacked(tokenId, owner, _priceInWei, _expiresAt)
+                abi.encodePacked(
+                    tokenId,
+                    owner,
+                    market,
+                    _priceInWei,
+                    _expiresAt
+                )
             );
     }
 
     function verify(
         uint tokenId,
         address owner,
+        address market,
         uint256 _priceInWei,
         uint256 _expiresAt,
         bytes memory signature
@@ -231,6 +251,7 @@ contract StoreFront2 is ERC721("MyNFT", "TNFT"), ERC721Enumerable {
         bytes32 messageHash = getMessageHash(
             tokenId,
             owner,
+            market,
             _priceInWei,
             _expiresAt
         );
