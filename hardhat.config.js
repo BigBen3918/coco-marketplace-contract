@@ -26,33 +26,33 @@ module.exports = {
         ganache: {
             url: "http://127.0.0.1:7545",
         },
-        fantomtestnet: {
+        fantom_test: {
             url: "https://rpc.testnet.fantom.network",
-            accounts: [process.env.PRIVATEKEY],
+            accounts: [process.env.PRIVATEKEY,process.env.PRIVATEKEY1],
         },
         ethereum: {
             url: "https://main-light.eth.linkpool.io/",
-            accounts: [process.env.PRIVATEKEY],
+            accounts: [process.env.PRIVATEKEY,process.env.PRIVATEKEY1],
         },
         ICICB: {
             url: "http://3.17.193.52/",
-            accounts: [process.env.PRIVATEKEY],
+            accounts: [process.env.PRIVATEKEY,process.env.PRIVATEKEY1],
         },
         ICICBtestnet: {
             url: "http://13.58.153.103/",
-            accounts: [process.env.PRIVATEKEY],
+            accounts: [process.env.PRIVATEKEY,process.env.PRIVATEKEY1],
         },
         bsc: {
             url: "https://bsc-dataseed1.ninicoin.io/",
-            accounts: [process.env.PRIVATEKEY],
+            accounts: [process.env.PRIVATEKEY,process.env.PRIVATEKEY1],
         },
         matic: {
             url: "https://rpc-mainnet.matic.quiknode.pro",
-            accounts: [process.env.PRIVATEKEY],
+            accounts: [process.env.PRIVATEKEY,process.env.PRIVATEKEY1],
         },
         fantom: {
             url: "https://rpc.ftm.tools/",
-            accounts: [process.env.PRIVATEKEY],
+            accounts: [process.env.PRIVATEKEY,process.env.PRIVATEKEY1],
         },
     },
     etherscan: {
@@ -61,13 +61,26 @@ module.exports = {
         apiKey: "WQKQ9RXXCTK715PKG1H7JUMV4ZEUW3KKXN",
     },
     solidity: {
-        version: "0.8.4",
-        settings: {
-            optimizer: {
-                enabled: true,
-                runs: 200,
-            },
-        },
+		compilers: [
+			{
+				version: "0.6.12",
+				settings: {
+					optimizer: {
+						enabled: true,
+						runs: 200,
+					},
+				}
+			},
+			{
+				version: "0.8.4",
+				settings: {
+					optimizer: {
+						enabled: true,
+						runs: 200,
+					},
+				}
+			},
+        ]
     },
     mocha: {
         timeout: 200000,

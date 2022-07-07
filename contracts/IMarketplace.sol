@@ -10,6 +10,8 @@ interface IMarketplace {
         address seller;
         // NFT registry address
         address nftAddress;
+        // accepted token for trading item
+        address acceptedToken;
         // Price (in wei) for the published item
         uint256 price;
         // Time when this sale ends
@@ -33,6 +35,7 @@ interface IMarketplace {
         address indexed seller,
         address indexed nftAddress,
         uint256 indexed assetId,
+        address acceptedToken,
         uint256 priceInWei,
         uint256 expiresAt
     );
@@ -72,6 +75,7 @@ interface IMarketplace {
         address _nftAddress,
         address owner,
         uint256 _assetId,
+        address _acceptedToken,
         uint256 _priceInWei,
         uint256 _expiresAt
     ) external;

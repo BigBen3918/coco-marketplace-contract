@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 library Base58 {
   bytes constant prefix1 = hex"0a";
@@ -63,7 +62,7 @@ library Base58 {
   }
 }
 
-contract StoreFront2 is ERC721("MyNFT","TNFT"),ERC721Enumerable{
+contract StoreFront_Buy is ERC721("MyNFT","TNFT"),ERC721Enumerable{
     uint256 public totalTokens;
     mapping(uint256 => string)private TokenURI;
 

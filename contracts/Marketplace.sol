@@ -15,7 +15,8 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
     using SafeMath for uint256;
     //using SafeERC20 for IERC20;
 
-    IERC20 public acceptedToken;
+    address public weth;
+    address[] public acceptedTokens;
 
     // From ERC721 registry assetId to Order (to avoid asset collision)
     mapping(address => mapping(uint256 => Order)) public orderByAssetId;
@@ -28,18 +29,20 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
 
     /**
      * @dev Initialize this contract. Acts as a constructor
-     * @param _acceptedToken - currency for payments
+     * @param _weth- eth currency for payments
      */
-    constructor(address _acceptedToken) {
-        require(
-            _acceptedToken.isContract(),
-            "The accepted token address must be a deployed contract"
-        );
-        acceptedToken = IERC20(_acceptedToken);
+    constructor(address _weth) {
+        weth = _weth;
+        acceptedTokens.push(_weth);
     }
 
-    function setAcceptedToken(address _acceptedToken) public onlyOwner {
-        acceptedToken = IERC20(_acceptedToken);
+    function addAcceptedToken(address _acceptedToken) public onlyOwner {
+        acceptedTokens.push(_acceptedToken);
+    }
+
+    function removeAcceptedToken(uint tokenIndex) public onlyOwner {
+        acceptedTokens[tokenIndex] = acceptedTokens[acceptedTokens.length - 1];
+        acceptedTokens.pop();
     }
 
     /**
@@ -54,6 +57,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
      * @dev Creates a new order
      * @param _nftAddress - Non fungible registry address
      * @param _assetId - ID of the published NFT
+     * @param _acceptedToken - accepted token to buy NFT
      * @param _priceInWei - Price in Wei for the supported coin
      * @param _expiresAt - Duration of the order (in hours)
      */
@@ -61,10 +65,18 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
         address _nftAddress,
         address owner,
         uint256 _assetId,
+        address _acceptedToken,
         uint256 _priceInWei,
         uint256 _expiresAt
     ) public override whenNotPaused {
-        _createOrder(_nftAddress, owner, _assetId, _priceInWei, _expiresAt);
+        _createOrder(
+            _nftAddress,
+            owner,
+            _assetId,
+            _acceptedToken,
+            _priceInWei,
+            _expiresAt
+        );
     }
 
     /**
@@ -136,30 +148,30 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
      * @param _assetId - ID of the published NFT
      * @param _priceInWei - Order price
      */
-    function safeExecuteOrder(
+    function ExecuteOrder(
         address _nftAddress,
         uint256 _assetId,
         uint256 _priceInWei
-    ) public whenNotPaused {
+    ) public payable whenNotPaused {
         // Get the current valid order for the asset or fail
         Order memory order = _getValidOrder(_nftAddress, _assetId);
 
         /// Check the execution price matches the order price
         require(order.price == _priceInWei, "Marketplace: invalid price");
-        require(order.seller != msg.sender, "Marketplace: unauthorized sender");
+        if (order.acceptedToken == weth) {
+            require(order.price == msg.value, "Marketplace: invalid price");
+        }
 
-        // market fee to cut
-        uint256 saleShareAmount = 0;
+        // calc market fees
+        uint256 saleShareAmount = _priceInWei.mul(FeeManager.cutPerMillion).div(
+            1e6
+        );
 
-        // Send market fees to owner
-        if (FeeManager.cutPerMillion > 0) {
-            // Calculate sale share
-            saleShareAmount = _priceInWei.mul(FeeManager.cutPerMillion).div(
-                1e6
-            );
-
+        if (order.acceptedToken == weth) {
+            payable(owner()).transfer(saleShareAmount);
+        } else {
             // Transfer share amount for marketplace Owner
-            acceptedToken.transferFrom(
+            IERC20(order.acceptedToken).transferFrom(
                 msg.sender, //buyer
                 owner(),
                 saleShareAmount
@@ -167,11 +179,16 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
         }
 
         // Transfer accepted token amount minus market fee to seller
-        acceptedToken.transferFrom(
-            msg.sender, // buyer
-            order.seller, // seller
-            order.price.sub(saleShareAmount)
-        );
+        if (order.acceptedToken == weth) {
+            payable(order.seller).transfer(order.price.sub(saleShareAmount));
+        } else {
+            // Transfer share amount for marketplace Owner
+            IERC20(order.acceptedToken).transferFrom(
+                msg.sender, //buyer
+                order.seller, // seller
+                order.price.sub(saleShareAmount)
+            );
+        }
 
         // Remove pending bid if any
         Bid memory bid = bidByOrderId[_nftAddress][_assetId];
@@ -189,64 +206,11 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
         );
     }
 
-    /*
-    buy
-    */
-    function Buy(
-        address _nftAddress,
-        uint256 _assetId,
-        uint256 _priceInWei
-    ) public whenNotPaused {
-        // Checks order validity
-        Order memory order = _getValidOrder(_nftAddress, _assetId);
-
-        require(_priceInWei == order.price, "Marketplace : price is not right");
-
-        // Check price if theres previous a bid
-        Bid memory bid = bidByOrderId[_nftAddress][_assetId];
-
-        // if theres no previous bid, just check price > 0
-        if (bid.id != 0) {
-            _cancelBid(bid.id, _nftAddress, _assetId, bid.bidder, bid.price);
-        } else {
-            require(_priceInWei > 0, "Marketplace: bid should be > 0");
-        }
-
-        // Transfer sale amount from bidder to escrow
-        acceptedToken.transferFrom(
-            msg.sender, // bidder
-            address(this),
-            _priceInWei
-        );
-
-        // calc market fees
-        uint256 saleShareAmount = _priceInWei.mul(FeeManager.cutPerMillion).div(
-            1e6
-        );
-
-        // to owner
-        acceptedToken.transfer(owner(), saleShareAmount);
-
-        // transfer escrowed bid amount minus market fee to seller
-        acceptedToken.transfer(order.seller, _priceInWei.sub(saleShareAmount));
-
-        // Transfer NFT asset
-        IERC721(_nftAddress).transferFrom(address(this), msg.sender, _assetId);
-
-        emit BuyCreated(
-            _nftAddress,
-            _assetId,
-            order.seller,
-            msg.sender,
-            _priceInWei
-        );
-    }
-
     /**
      * @dev Places a bid for a published NFT and checks for the asset fingerprint
      * @param _nftAddress - Address of the NFT registry
      * @param _assetId - ID of the published NFT
-     * @param _priceInWei - Bid price in acceptedToken currency
+     * @param _priceInWei - Bid price in weth currency
      * @param _expiresAt - Bid expiration time
      */
     function PlaceBid(
@@ -254,7 +218,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
         uint256 _assetId,
         uint256 _priceInWei,
         uint256 _expiresAt
-    ) public whenNotPaused {
+    ) public payable whenNotPaused {
         _createBid(_nftAddress, _assetId, _priceInWei, _expiresAt);
     }
 
@@ -313,11 +277,28 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
             1e6
         );
 
-        // to owner
-        acceptedToken.transfer(owner(), saleShareAmount);
+        if (order.acceptedToken == weth) {
+            payable(owner()).transfer(saleShareAmount);
+        } else {
+            // Transfer share amount for marketplace Owner
+            IERC20(order.acceptedToken).transferFrom(
+                msg.sender, //buyer
+                owner(),
+                saleShareAmount
+            );
+        }
 
         // transfer escrowed bid amount minus market fee to seller
-        acceptedToken.transfer(order.seller, bid.price.sub(saleShareAmount));
+        if (order.acceptedToken == weth) {
+            payable(order.seller).transfer(bid.price.sub(saleShareAmount));
+        } else {
+            // Transfer share amount for marketplace Owner
+            IERC20(order.acceptedToken).transferFrom(
+                msg.sender, //buyer
+                order.seller, // seller
+                bid.price.sub(saleShareAmount)
+            );
+        }
 
         _executeOrder(order.id, bid.bidder, _nftAddress, _assetId, _priceInWei);
     }
@@ -377,6 +358,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
         address _nftAddress,
         address _owner,
         uint256 _assetId,
+        address _acceptedToken,
         uint256 _priceInWei,
         uint256 _expiresAt
     ) internal {
@@ -408,6 +390,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
                 _owner,
                 _nftAddress,
                 _assetId,
+                _acceptedToken,
                 _priceInWei
             )
         );
@@ -417,6 +400,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
             id: orderId,
             seller: _owner,
             nftAddress: _nftAddress,
+            acceptedToken: _acceptedToken,
             price: _priceInWei,
             expiresAt: _expiresAt
         });
@@ -426,6 +410,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
             _owner,
             _nftAddress,
             _assetId,
+            _acceptedToken,
             _priceInWei,
             _expiresAt
         );
@@ -447,9 +432,10 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
         // Checks order validity
         Order memory order = _getValidOrder(_nftAddress, _assetId);
 
+        uint expiresAt = _expiresAt;
         // check on expire time
         if (_expiresAt > order.expiresAt) {
-            _expiresAt = order.expiresAt;
+            expiresAt = order.expiresAt;
         }
 
         // Check price if theres previous a bid
@@ -472,11 +458,14 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
         }
 
         // Transfer sale amount from bidder to escrow
-        acceptedToken.transferFrom(
-            msg.sender, // bidder
-            address(this),
-            _priceInWei
-        );
+        if (order.acceptedToken == weth)
+            require(msg.value == _priceInWei, "invalid value for price");
+        else
+            IERC20(order.acceptedToken).transferFrom(
+                msg.sender, // bidder
+                address(this),
+                _priceInWei
+            );
 
         // Create bid
         bytes32 bidId = keccak256(
@@ -485,7 +474,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
                 msg.sender,
                 order.id,
                 _priceInWei,
-                _expiresAt
+                expiresAt
             )
         );
 
@@ -494,7 +483,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
             id: bidId,
             bidder: msg.sender,
             price: _priceInWei,
-            expiresAt: _expiresAt
+            expiresAt: expiresAt
         });
 
         emit BidCreated(
@@ -503,7 +492,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
             _assetId,
             msg.sender, // bidder
             _priceInWei,
-            _expiresAt
+            expiresAt
         );
     }
 
@@ -546,9 +535,13 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
         uint256 _escrowAmount
     ) internal {
         delete bidByOrderId[_nftAddress][_assetId];
+        Order memory order = _getValidOrder(_nftAddress, _assetId);
 
+        if (order.acceptedToken == weth) {
+            payable(_bidder).transfer(_escrowAmount);
+        }
         // return escrow to canceled bidder
-        acceptedToken.transfer(_bidder, _escrowAmount);
+        IERC20(order.acceptedToken).transfer(_bidder, _escrowAmount);
 
         emit BidCancelled(_bidId);
     }
