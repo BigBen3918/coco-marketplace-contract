@@ -36,7 +36,7 @@ module.exports = {
             url: "http://127.0.0.1:7545",
         },
         fantom_test: {
-            url: "https://ftm-test.babylonswap.finance",//"https://rpc.testnet.fantom.network",
+            url: "https://rpc.testnet.fantom.network",//"https://rpc.testnet.fantom.network",
             accounts: [process.env.PRIVATEKEY, process.env.PRIVATEKEY1],
         },
         ethereum: {

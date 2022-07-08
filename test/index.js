@@ -109,8 +109,14 @@ describe("normal test contract", function () {
         tx = await NFT1.mint("test2");
         await tx.wait();
     })
+    it("onsale and buy nft", async function () {
+        var tx = await NFT1.approve(marketplace.address, "0");
+        await tx.wait();
+        tx = await marketplace.createOrder(NFT1.address, "0");
+        await tx.wait();
+    })
     it("onsale nft", async function () {
-        let tx = await NFT1.mint("test");
+        let tx = await NFT1.approve(marketplace.address, owner.address,"0",wETH.address,toBigNum(0.1));
         await tx.wait();
     })
 });
