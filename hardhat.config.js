@@ -28,7 +28,7 @@ module.exports = {
         },
         fantom_test: {
             url: "https://rpc.testnet.fantom.network",
-            accounts: [process.env.PRIVATEKEY,process.env.PRIVATEKEY1],
+            accounts: [process.env.PRIVATEKEY, process.env.PRIVATEKEY1],
         },
         ethereum: {
             url: "https://main-light.eth.linkpool.io/",
