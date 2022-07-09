@@ -12,14 +12,14 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
     }
 });
 
-task("check-price", "", async (taskArgs, hre) => {
-    const [owner] = await ethers.getSigners();
-    const Factory = await ethers.getContractFactory("Marketplace");
-    const marketplace = await Factory.attach("0x19c82A352995424Ec6783D18a52c78220A7E60A9");
-    let data = await marketplace.orderByAssetId("0x5017a7f8B89b1eE16DEeE58A8a17Ba4e35060378", "5");
-    console.log(data);
+// task("check-price", "", async (taskArgs, hre) => {
+//     const [owner] = await ethers.getSigners();
+//     const Factory = await ethers.getContractFactory("Marketplace");
+//     const marketplace = await Factory.attach("0x19c82A352995424Ec6783D18a52c78220A7E60A9");
+//     let data = await marketplace.orderByAssetId("0x5017a7f8B89b1eE16DEeE58A8a17Ba4e35060378", "5");
+//     console.log(data);
 
-})
+// })
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -36,7 +36,7 @@ module.exports = {
             url: "http://127.0.0.1:7545",
         },
         fantom_test: {
-            url: "https://rpc.testnet.fantom.network",//"https://rpc.testnet.fantom.network",
+            url: "https://ftm-test.babylonswap.finance",//"https://rpc.testnet.fantom.network",
             accounts: [process.env.PRIVATEKEY, process.env.PRIVATEKEY1],
         },
         ethereum: {
