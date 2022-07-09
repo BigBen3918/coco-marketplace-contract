@@ -27,12 +27,12 @@ describe("Create UserWallet", function () {
 describe("deploy contract", function () {
     it("store front contract", async function () {
         const Factory = await ethers.getContractFactory("StoreFront");
-        storeFront = await Factory.deploy(owner.address, "store front contract", "sfc");
+        storeFront = await Factory.deploy(owner.address, "storeFrontContract", "sfc");
         await storeFront.deployed();
     });
     it("nft contracts", async function () {
         const Factory = await ethers.getContractFactory("NFT");
-        NFT1 = await Factory.deploy("test1 NFT", "t1NFT");
+        NFT1 = await Factory.deploy("test1NFT", "t1NFT");
         await NFT1.deployed();
     });
     it("test token", async function () {
@@ -52,7 +52,7 @@ describe("deploy contract", function () {
     });
 });
 
-describe("test contract", function () {
+describe("store front test contract", function () {
     it("mint nft", async function () {
         const createNFT = async (metadata, nftAddress) => {
             let bufferfile = Buffer.from(JSON.stringify(metadata));
@@ -100,6 +100,19 @@ describe("test contract", function () {
 
         await onsaleNFT(storeFront.address, tokenId, owner.address, toBigNum("1"), toBigNum("10000000000000000000", 0));
     });
+});
+
+describe("normal test contract", function () {
+    it("mint nft", async function () {
+        var tx = await NFT1.mint("test1");
+        await tx.wait();
+        tx = await NFT1.mint("test2");
+        await tx.wait();
+    })
+    it("onsale nft", async function () {
+        let tx = await NFT1.mint("test");
+        await tx.wait();
+    })
 });
 
 describe("marketplace contract", function () {
