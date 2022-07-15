@@ -539,10 +539,10 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
 
         if (order.acceptedToken == weth) {
             payable(_bidder).transfer(_escrowAmount);
+        } else {
+            // return escrow to canceled bidder
+            IERC20(order.acceptedToken).transfer(_bidder, _escrowAmount);
         }
-        // return escrow to canceled bidder
-        IERC20(order.acceptedToken).transfer(_bidder, _escrowAmount);
-
         emit BidCancelled(_bidId);
     }
 
