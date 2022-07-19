@@ -526,7 +526,7 @@ contract Marketplace is Ownable, Pausable, FeeManager, IMarketplace {
      * @param _assetId - ID of the published NFT
      * @param _bidder - Address
      * @param _escrowAmount - in acceptenToken currency
-     */
+     */  
     function _cancelBid(
         bytes32 _bidId,
         address _nftAddress,

@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const bs58 = require('bs58')
+const bs58 = require("bs58");
 const { ethers } = require("hardhat");
 const ipfsAPI = require("ipfs-api");
 const ipfs = ipfsAPI("localhost", "5001", { protocol: "http" });
@@ -27,7 +27,11 @@ describe("Create UserWallet", function () {
 describe("deploy contract", function () {
     it("store front contract", async function () {
         const Factory = await ethers.getContractFactory("StoreFront");
-        storeFront = await Factory.deploy(owner.address, "storeFrontContract", "sfc");
+        storeFront = await Factory.deploy(
+            owner.address,
+            "storeFrontContract",
+            "sfc"
+        );
         await storeFront.deployed();
     });
     it("nft contracts", async function () {
@@ -39,12 +43,12 @@ describe("deploy contract", function () {
         const Factory = await ethers.getContractFactory("Token");
         testToken = await Factory.deploy(toBigNum("1000000000000000"));
         await testToken.deployed();
-    })
+    });
     it("test weth token", async function () {
         const Factory = await ethers.getContractFactory("WETH");
         wETH = await Factory.deploy();
         await wETH.deployed();
-    })
+    });
     it("marketplace contract", async function () {
         const Factory = await ethers.getContractFactory("Marketplace");
         marketplace = await Factory.deploy(wETH.address);
@@ -58,21 +62,21 @@ describe("deploy contract", function () {
 //             let bufferfile = Buffer.from(JSON.stringify(metadata));
 
 //             let file = await ipfs.files.add(bufferfile);
-//             const bytes = bs58.decode(file[0].hash)
-//             const hex = Buffer.from(bytes).toString('hex')
+//             const bytes = bs58.decode(file[0].hash);
+//             const hex = Buffer.from(bytes).toString("hex");
 //             tokenId = "0x" + hex.slice(4);
-//             console.log("prefix", hex.slice(0, 4))
+//             console.log("prefix", hex.slice(0, 4));
 //             console.log("tokenId", tokenId);
 //             let tokenInfo = db && db[nftAddress] && db[nftAddress][tokenId];
 //             if (tokenInfo != null) throw new Error("token already minted");
 
 //             let collection = {
 //                 [tokenId]: {
-//                     owner: owner.address
-//                 }
+//                     owner: owner.address,
+//                 },
 //             };
 //             db[nftAddress] = collection;
-//         }
+//         };
 
 //         let metadata = { name: "test1" };
 //         let metadata2 = { name: "test2" };
@@ -80,28 +84,49 @@ describe("deploy contract", function () {
 //         await createNFT(metadata2, storeFront.address);
 //     });
 //     it("onsale nft", async function () {
-//         const onsaleNFT = async (nftAddress, tokenId, ownerAddress, _priceInWei, _expiresAt) => {
+//         const onsaleNFT = async (
+//             nftAddress,
+//             tokenId,
+//             ownerAddress,
+//             _priceInWei,
+//             _expiresAt
+//         ) => {
 //             //backend
-//             if (db[nftAddress][tokenId].owner != ownerAddress) throw new Error("invalid request");
+//             if (db[nftAddress][tokenId].owner != ownerAddress)
+//                 throw new Error("invalid request");
 //             let onsaleData = {
 //                 tokenId,
 //                 owner: ownerAddress,
 //                 market: marketplace.address,
 //                 _priceInWei: _priceInWei,
 //                 _expiresAt: _expiresAt,
-//                 signer: owner
-//             }
+//                 signer: owner,
+//             };
+//             console.log(onsaleData);
 //             let signature = await sign(onsaleData);
 
 //             //front end
 //             var { market, _priceInWei, _expiresAt } = onsaleData;
-//             var tx = await storeFront.mintAndOnsale(tokenId, market, wETH.address, _priceInWei, _expiresAt, signature);
+//             var tx = await storeFront.mintAndOnsale(
+//                 tokenId,
+//                 market,
+//                 wETH.address,
+//                 _priceInWei,
+//                 _expiresAt,
+//                 signature
+//             );
 //             await tx.wait();
 
 //             console.log(await storeFront.ownerOf(tokenId));
-//         }
+//         };
 
-//         await onsaleNFT(storeFront.address, tokenId, owner.address, toBigNum("1"), toBigNum("10000000000000000000", 0));
+//         await onsaleNFT(
+//             storeFront.address,
+//             tokenId,
+//             owner.address,
+//             toBigNum("1"),
+//             toBigNum("10000000000000000000", 0)
+//         );
 //     });
 // });
 
@@ -140,27 +165,40 @@ describe("deploy contract", function () {
 //         await tx.wait();
 //         let lastBalance = await ethers.provider.getBalance(owner.address);
 //         console.log(fromBigNum(lastBalance.sub(initBalance)));
-//     }); 
+//     });
 // });
 
 describe("Save contracts", function () {
+    it("save bytecode", async function () {
+        const bytecode = {
+            NFT: artifacts.readArtifactSync("NFT").bytecode,
+        };
+
+        await saveFiles(
+            "bytecode.json",
+            JSON.stringify(bytecode, undefined, 4)
+        );
+    });
     it("save abis", async function () {
         const abis = {
             NFT: artifacts.readArtifactSync("NFT").abi,
             StoreFront: artifacts.readArtifactSync("StoreFront").abi,
             Marketplace: artifacts.readArtifactSync("Marketplace").abi,
-            TestToken: artifacts.readArtifactSync("ERC20").abi
-        }
+            TestToken: artifacts.readArtifactSync("ERC20").abi,
+        };
         await saveFiles("abis.json", JSON.stringify(abis, undefined, 4));
-    })
+    });
     it("save addresses", async function () {
         const addresses = {
             StoreFront: storeFront.address,
             NFT1: NFT1.address,
             Marketplace: marketplace.address,
             TestToken: testToken.address,
-            WETH: wETH.address
-        }
-        await saveFiles("addresses.json", JSON.stringify(addresses, undefined, 4));
-    })
-})
+            WETH: wETH.address,
+        };
+        await saveFiles(
+            "addresses.json",
+            JSON.stringify(addresses, undefined, 4)
+        );
+    });
+});
