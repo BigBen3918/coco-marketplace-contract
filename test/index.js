@@ -102,24 +102,49 @@ describe("store front test contract", function () {
     });
 });
 
-// describe("normal test contract", function () {
-//     it("mint nft", async function () {
-//         var tx = await NFT1.mint("test1");
-//         await tx.wait();
-//         tx = await NFT1.mint("test2");
-//         await tx.wait();
-//     })
-//     it("onsale and buy nft", async function () {
-//         var tx = await NFT1.approve(marketplace.address, "0");
-//         await tx.wait();
-//         tx = await marketplace.createOrder(NFT1.address, "0");
-//         await tx.wait();
-//     })
-//     it("onsale nft", async function () {
-//         let tx = await NFT1.approve(marketplace.address, owner.address,"0",wETH.address,toBigNum(0.1));
-//         await tx.wait();
-//     })
-// });
+describe("normal contract test", function () {
+    it("mint nft", async function () {
+        var tx = await NFT1.mint("test1");
+        await tx.wait();
+        tx = await NFT1.mint("test2");
+        await tx.wait();
+    })
+    it("onsale", async function () {
+        var tx = await NFT1.approve(marketplace.address, "0");
+        await tx.wait();
+        tx = await marketplace.createOrder(NFT1.address, owner.address, "0", wETH.address, toBigNum(0.1), "10000000000000000000");
+        await tx.wait();
+        tx = await NFT1.approve(marketplace.address, "1");
+        await tx.wait();
+        tx = await marketplace.createOrder(NFT1.address, owner.address, "1", wETH.address, toBigNum(0.1), "10000000000000000000");
+        await tx.wait();
+    })
+    it("buy nft", async function () {
+        let initBalance = await ethers.provider.getBalance(owner.address);
+        let tx = await (marketplace.connect(userWallet)).ExecuteOrder(NFT1.address, "0", toBigNum("0.1"), { value: toBigNum("0.1") });
+        await tx.wait();
+        let lastBalance = await ethers.provider.getBalance(owner.address);
+        console.log(fromBigNum(lastBalance.sub(initBalance)));
+    });
+    it("bit nft", async function () {
+        var tx = await marketplace.PlaceBid(NFT1.address, "1", toBigNum("0.05"), toBigNum("10000000000000000000", 0), { value: toBigNum("0.05") });
+        await tx.wait();
+    });
+    it("buy nft", async function () {
+        let initBalance = await ethers.provider.getBalance(owner.address);
+        let tx = await (marketplace.connect(userWallet)).ExecuteOrder(NFT1.address, "1", toBigNum("0.1"), { value: toBigNum("0.1") });
+        await tx.wait();
+        let lastBalance = await ethers.provider.getBalance(owner.address);
+        console.log(fromBigNum(lastBalance.sub(initBalance)));
+    });
+    // it("accept bid", async () => {
+    //     var initBalance = await ethers.provider.getBalance(owner.address);
+    //     var tx = await marketplace.acceptBid(NFT1.address, "1", toBigNum("0.05"));
+    //     await tx.wait();
+    //     var lastBalance = await ethers.provider.getBalance(owner.address);
+    //     console.log(fromBigNum(lastBalance.sub(initBalance)));
+    // })
+});
 
 describe("marketplace contract", function () {
     // it("buy nft", async function () {
