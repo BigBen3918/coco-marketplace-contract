@@ -7,7 +7,7 @@ const { delay, fromBigNum, toBigNum, saveFiles, sign } = require("./utils.js");
 var owner;
 var userWallet;
 
-var storeFront, NFT1;
+var storeFront, NFT1, NFTA;
 var marketplace;
 
 //mock
@@ -38,6 +38,10 @@ describe("deploy contract", function () {
         const Factory = await ethers.getContractFactory("NFT");
         NFT1 = await Factory.deploy("test1NFT", "t1NFT");
         await NFT1.deployed();
+
+        const NFTA_ = await ethers.getContractFactory("NFTA");
+        NFTA = await NFTA_.deploy("test1NFT", "t1NFT");
+        await NFTA.deployed();
     });
     it("test token", async function () {
         const Factory = await ethers.getContractFactory("Token");
@@ -102,7 +106,6 @@ describe("deploy contract", function () {
 //                 _expiresAt: _expiresAt,
 //                 signer: owner,
 //             };
-//             console.log(onsaleData);
 //             let signature = await sign(onsaleData);
 
 //             //front end
@@ -130,20 +133,42 @@ describe("deploy contract", function () {
 //     });
 // });
 
-// describe("normal test contract", function () {
-//     it("mint nft", async function () {
-//         var tx = await NFT1.mint("test1");
-//         await tx.wait();
-//         tx = await NFT1.mint("test2");
-//         await tx.wait();
-//     })
-//     it("onsale nft", async function () {
-//         let tx = await NFT1.mint("test");
-//         await tx.wait();
-//     })
-// });
+describe("normal test contract", function () {
+    it("mint nft", async function () {
+        var tx = await NFT1.mint("test1");
+        await tx.wait();
+        tx = await NFT1.mint("test2");
+        await tx.wait();
+    })
+    it("transfer nft", async function () {
+        var tx = await NFT1.transferFrom(owner.address, marketplace.address, "1");
+        await tx.wait();
+    })
+    it("onsale nft", async function () {
+        let tx = await NFT1.approve(marketplace.address, "0");
+        await tx.wait();
+        tx = await marketplace.createOrder(NFT1.address, owner.address, "0", wETH.address, toBigNum("1"), toBigNum("10000000000000000000", 0));
+        await tx.wait();
+    })
+});
+describe("ERC721a test contract", function () {
+    it("mint nft", async function () {
+        var tx = await NFTA.mint("2", ["test1", "test2"]);
+        await tx.wait();
+    })
+    it("transfer nft", async function () {
+        var tx = await NFTA.transferFrom(owner.address, marketplace.address, "1");
+        await tx.wait();
+    })
+    it("onsale nft", async function () {
+        let tx = await NFTA.approve(marketplace.address, "0");
+        await tx.wait();
+        tx = await marketplace.createOrder(NFTA.address, owner.address, "0", wETH.address, toBigNum("1"), toBigNum("10000000000000000000", 0));
+        await tx.wait();
+    })
+});
 
-// describe("marketplace contract", function () {
+// describe("marketplace contract test", function () {
 //     // it("buy nft", async function () {
 //     //     let initBalance = await ethers.provider.getBalance(owner.address);
 //     //     let tx = await (marketplace.connect(userWallet)).ExecuteOrder(storeFront.address, tokenId, toBigNum("1"), { value: toBigNum("1") });
