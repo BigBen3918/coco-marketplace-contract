@@ -1,12 +1,11 @@
-
 const { ethers } = require("hardhat");
-const fs = require('fs');
+const fs = require("fs");
 /**
  * set delay for delayTimes
  * @param {Number} delayTimes - timePeriod for delay
  */
 function delay(delayTimes) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         setTimeout(() => {
             resolve(2);
         }, delayTimes);
@@ -14,7 +13,7 @@ function delay(delayTimes) {
 }
 
 /**
- * change data type from Number to BigNum 
+ * change data type from Number to BigNum
  * @param {Number} value - data that need to be change
  * @param {Number} d - decimals
  */
@@ -44,12 +43,9 @@ const saveFiles = async (fileName, data) => {
         fs.mkdirSync(contractsDir);
     }
 
-    fs.writeFileSync(
-        contractsDir + fileName,
-        data
-    );
+    fs.writeFileSync(contractsDir + fileName, data);
     console.log("export file", fileName);
-}
+};
 
 /**
  * sign data with signer
@@ -58,13 +54,18 @@ const saveFiles = async (fileName, data) => {
 const sign = async (data) => {
     const { tokenId, owner, market, _priceInWei, _expiresAt, signer } = data;
     try {
-        let messageHash = ethers.utils.solidityKeccak256(["uint", "address", "address", "uint", "uint"], [tokenId, owner, market, _priceInWei, _expiresAt]);
-        let signature = await signer.signMessage(ethers.utils.arrayify(messageHash));
-        return signature
+        let messageHash = ethers.utils.solidityKeccak256(
+            ["uint", "address", "address", "uint", "uint"],
+            [tokenId, owner, market, _priceInWei, _expiresAt]
+        );
+        let signature = await signer.signMessage(
+            ethers.utils.arrayify(messageHash)
+        );
+        return signature;
     } catch (err) {
-        console.log(err)
-        return null
+        console.log(err);
+        return null;
     }
-}
+};
 
 module.exports = { delay, toBigNum, fromBigNum, saveFiles, sign };

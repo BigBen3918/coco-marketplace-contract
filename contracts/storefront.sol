@@ -186,11 +186,6 @@ contract StoreFront is ERC721, ERC721Enumerable {
         );
         creators[tokenId] = msg.sender;
         _mint(address(this), tokenId);
-        address owner = ownerOf(tokenId);
-        require(
-            owner == address(this),
-            string(abi.encodePacked(owner, "/", address(this)))
-        );
         _approve(market, tokenId);
         IMarketplace(market).createOrder(
             address(this),
