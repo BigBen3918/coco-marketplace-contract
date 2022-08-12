@@ -16,11 +16,11 @@ task("check-price", "", async (taskArgs, hre) => {
     const [owner] = await ethers.getSigners();
     const Factory = await ethers.getContractFactory("Marketplace");
     const marketplace = await Factory.attach(
-        "0x19c82A352995424Ec6783D18a52c78220A7E60A9"
+        "0x3b84A563F30e228b6E52Faf71912CB35B7BC4d47"
     );
     let data = await marketplace.orderByAssetId(
-        "0x5017a7f8B89b1eE16DEeE58A8a17Ba4e35060378",
-        "5"
+        "0x8bC30e656151e2EB862b80B395A76c050527D6A5",
+        "0xa45cedbed0905b5b518466648e3834af4e86c23d92ddd57c6f31c4e7c3d7972c"
     );
     console.log(data);
 });

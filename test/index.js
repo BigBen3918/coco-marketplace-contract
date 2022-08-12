@@ -102,10 +102,10 @@ describe("deploy contract", function () {
 //                 _expiresAt: _expiresAt,
 //                 signer: owner,
 //             };
-//             console.log(onsaleData);
 //             let signature = await sign(onsaleData);
 
 //             //front end
+//             console.log(fromBigNum(_priceInWei));
 //             var { market, _priceInWei, _expiresAt } = onsaleData;
 //             var tx = await storeFront.mintAndOnsale(
 //                 tokenId,
@@ -124,7 +124,7 @@ describe("deploy contract", function () {
 //             storeFront.address,
 //             tokenId,
 //             owner.address,
-//             toBigNum("1"),
+//             toBigNum("0.1", 18),
 //             toBigNum("10000000000000000000", 0)
 //         );
 //     });
