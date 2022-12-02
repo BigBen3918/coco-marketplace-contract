@@ -67,6 +67,10 @@ module.exports = {
             url: "https://rpc.ftm.tools/",
             accounts: [process.env.PRIVATEKEY, process.env.PRIVATEKEY1],
         },
+        rinkby: {
+            url: "http://85.206.160.196",
+            accounts: [process.env.PRIVATEKEY, process.env.PRIVATEKEY1],
+        },
     },
     etherscan: {
         // Your API key for Etherscan

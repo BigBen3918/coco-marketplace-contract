@@ -134,40 +134,40 @@ describe("deploy contract", function () {
 //     });
 // });
 
-describe("normal test contract", function () {
-    it("mint nft", async function () {
-        var tx = await NFT1.mint("test1");
-        await tx.wait();
-        tx = await NFT1.mint("test2");
-        await tx.wait();
-    })
-    it("transfer nft", async function () {
-        var tx = await NFT1.transferFrom(owner.address, marketplace.address, "1");
-        await tx.wait();
-    })
-    it("onsale nft", async function () {
-        let tx = await NFT1.approve(marketplace.address, "0");
-        await tx.wait();
-        tx = await marketplace.createOrder(NFT1.address, owner.address, "0", wETH.address, toBigNum("1"), toBigNum("10000000000000000000", 0));
-        await tx.wait();
-    })
-});
-describe("ERC721a test contract", function () {
-    it("mint nft", async function () {
-        var tx = await NFTA.mint("2", ["test1", "test2"]);
-        await tx.wait();
-    })
-    it("transfer nft", async function () {
-        var tx = await NFTA.transferFrom(owner.address, marketplace.address, "1");
-        await tx.wait();
-    })
-    it("onsale nft", async function () {
-        let tx = await NFTA.approve(marketplace.address, "0");
-        await tx.wait();
-        tx = await marketplace.createOrder(NFTA.address, owner.address, "0", wETH.address, toBigNum("1"), toBigNum("10000000000000000000", 0));
-        await tx.wait();
-    })
-});
+// describe("normal test contract", function () {
+//     it("mint nft", async function () {
+//         var tx = await NFT1.mint("test1");
+//         await tx.wait();
+//         tx = await NFT1.mint("test2");
+//         await tx.wait();
+//     })
+//     it("transfer nft", async function () {
+//         var tx = await NFT1.transferFrom(owner.address, marketplace.address, "1");
+//         await tx.wait();
+//     })
+//     it("onsale nft", async function () {
+//         let tx = await NFT1.approve(marketplace.address, "0");
+//         await tx.wait();
+//         tx = await marketplace.createOrder(NFT1.address, owner.address, "0", wETH.address, toBigNum("1"), toBigNum("10000000000000000000", 0));
+//         await tx.wait();
+//     })
+// });
+// describe("ERC721a test contract", function () {
+//     it("mint nft", async function () {
+//         var tx = await NFTA.mint("2", ["test1", "test2"]);
+//         await tx.wait();
+//     })
+//     it("transfer nft", async function () {
+//         var tx = await NFTA.transferFrom(owner.address, marketplace.address, "1");
+//         await tx.wait();
+//     })
+//     it("onsale nft", async function () {
+//         let tx = await NFTA.approve(marketplace.address, "0");
+//         await tx.wait();
+//         tx = await marketplace.createOrder(NFTA.address, owner.address, "0", wETH.address, toBigNum("1"), toBigNum("10000000000000000000", 0));
+//         await tx.wait();
+//     })
+// });
 
 // describe("marketplace contract test", function () {
 //     // it("buy nft", async function () {
